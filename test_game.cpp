@@ -61,8 +61,8 @@ public:
     int xres, yres;
     char keys[65536];
     Global() {
-        xres = 960;
-        yres = 1080;
+        xres = 900;
+        yres = 1000;
         memset(keys, 0, 65536);
     }
 } gl;
