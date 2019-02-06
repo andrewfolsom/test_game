@@ -40,7 +40,7 @@ const float timeslice = 1.0f;
 const float gravity = -0.2f;
 #define PI 3.141592653589793
 #define ALPHA 1
-const int MAX_BULLETS = 11;
+const int MAX_BULLETS = 1000;
 const float MAX_VELOCITY = 15;
 const Flt MINIMUM_ASTEROID_SIZE = 60.0;
 
@@ -89,16 +89,34 @@ public:
     }
 };
 
+class Bullet {
+public:
+    Vec pos;
+    Vec vel;
+    float color[3];
+    struct timespec time;
+public:
+    Bullet() { }
+};
+
 class Game {
 public:
     Ship ship;
+    Bullet *barr;
+    int nbullets;
+    struct timespec bulletTimer;
     struct timespec thrustTimer;
     bool thrustOn;
 public:
     Game() {
         thrustOn = false;
+        barr = new Bullet[MAX_BULLETS];
+        nbullets = 0;
+        clock_gettime(CLOCK_REALTIME, &bulletTimer);
     }
-    ~Game() { }
+    ~Game() {
+        delete [] barr;
+    }
 } g;
 
 class X11_wrapper {
@@ -246,6 +264,9 @@ int check_keys(XEvent *e)
             case XK_s:
                 gl.keys[XK_s] = 1;
                 break;
+            case XK_space:
+                gl.keys[XK_space] = 1;
+                break;
             case XK_Escape:
                 return 1;
         }
@@ -266,6 +287,9 @@ int check_keys(XEvent *e)
                 break;
             case XK_s:
                 gl.keys[XK_s] = 0;
+                break;
+            case XK_space:
+                gl.keys[XK_space] = 0;
                 break;
         }
     }
@@ -318,6 +342,21 @@ void physics()
         s->pos[1] = 20.0;
     } else if (s->pos[1] > gl.yres - 20.0) {
         s->pos[1] = gl.yres - 20.0;
+    }
+
+    struct timespec bt;
+    clock_gettime(CLOCK_REALTIME, &bt);
+    int i = 0;
+    while (i < g.nbullets) {
+        Bullet *b = &g.barr[i];
+        if (b->pos[1] > gl.yres + 10) {
+            memcpy(&g.barr[i], &g.barr[g.nbullets - 1], sizeof(Bullet));
+            g.nbullets--;
+            continue;
+        }
+        b->pos[0] += b->vel[0];
+        b->pos[1] += b->vel[1];
+        i++;
     }
 
     if (gl.keys[XK_a]) {
@@ -377,6 +416,27 @@ void physics()
         }
     }
 
+    if (gl.keys[XK_space]) {
+        struct timespec bt;
+        clock_gettime(CLOCK_REALTIME, &bt);
+        double ts = timeDiff(&g.bulletTimer, &bt);
+        if (ts > 0.1) {
+            timeCopy(&g.bulletTimer, &bt);
+            if (g.nbullets < MAX_BULLETS) {
+                Bullet *b = &g.barr[g.nbullets];
+                timeCopy(&b->time, &bt);
+                b->pos[0] = s->pos[0];
+                b->pos[1] = s->pos[1] + 30;
+                b->vel[0] = 0.0;
+                b->vel[1] = 30.0;
+                b->color[0] = 1.0f;
+                b->color[1] = 0.5f;
+                b->color[2] = 1.0f;
+                g.nbullets++;
+            }
+        }
+    }
+
     if (g.thrustOn) {
         struct timespec mtt;
         clock_gettime(CLOCK_REALTIME, &mtt);
@@ -401,4 +461,18 @@ void render()
     glVertex2f(20.0, -20.0);
     glEnd();
     glPopMatrix();
+
+    for (int i = 0; i < g.nbullets; i++) {
+        Bullet *b = &g.barr[i];
+        glColor3fv(b->color);
+        glPushMatrix();
+        glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
+        glBegin(GL_QUADS);
+        glVertex2f(-5.0, -5.0);
+        glVertex2f(-5.0, 5.0);
+        glVertex2f(5.0, 5.0);
+        glVertex2f(5.0, -5.0);
+        glEnd();
+        glPopMatrix();
+    }
 }
