@@ -41,7 +41,7 @@ const float gravity = -0.2f;
 #define PI 3.141592653589793
 #define ALPHA 1
 const int MAX_BULLETS = 11;
-const float MAX_VELOCITY = 30;
+const float MAX_VELOCITY = 15;
 const Flt MINIMUM_ASTEROID_SIZE = 60.0;
 
   //-------------------------------------------------------------------------- :                                                                         
@@ -84,7 +84,7 @@ public:
         vel[1] = (Flt)(0);
         vel[2] = (Flt)(0);
         vel[3] = (Flt)(0);
-        speed = 0.2;
+        speed = 0.4;
         color[0] = color[1] = color[2] = 1.0;
     }
 };
