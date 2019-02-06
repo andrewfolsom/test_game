@@ -41,6 +41,7 @@ const float gravity = -0.2f;
 #define PI 3.141592653589793
 #define ALPHA 1
 const int MAX_BULLETS = 11;
+const float MAX_VELOCITY = 30;
 const Flt MINIMUM_ASTEROID_SIZE = 60.0;
 
   //-------------------------------------------------------------------------- :                                                                         
@@ -83,7 +84,7 @@ public:
         vel[1] = (Flt)(0);
         vel[2] = (Flt)(0);
         vel[3] = (Flt)(0);
-        speed = 0.02;
+        speed = 0.2;
         color[0] = color[1] = color[2] = 1.0;
     }
 };
@@ -280,8 +281,8 @@ void moveLeft()
         s->vel[0] = 10.0;
         return;
     }
-    if (s->vel[0] > 30) {
-        s->vel[0] = 30;
+    if (s->vel[0] > MAX_VELOCITY) {
+        s->vel[0] = MAX_VELOCITY;
         return;
     }
     s->vel[0] += s->speed;
@@ -307,7 +308,7 @@ void moveRight()
 
 void physics()
 {
-    float spdLeft, spdRight, spdUp, spdDown;
+    //float spdLeft, spdRight, spdUp, spdDown;
     Ship *s = &g.ship;
     if (s->pos[0] < 20.0) {
         s->pos[0] = 20.0;
@@ -322,39 +323,58 @@ void physics()
     if (gl.keys[XK_a]) {
        s->pos[0] -= s->vel[0];
        s->vel[0] += s->speed;
-       s->speed *= 2;
-       if (s->vel[0] > 10.0)
-           s->vel[0] = 10.0;
+       if (s->vel[0] > MAX_VELOCITY)
+           s->vel[0] = MAX_VELOCITY;
     } else {
-        if(s->vel != 0.0) {
+        if(s->vel[0] > 0.0) {
             s->pos[0] -= s->vel[0];
-            s->vel[0] /= 4;
+            s->vel[0] -= s->speed * 3;
+        } else {
+            s->vel[0] = 0.0;
+        }
+    }
             
 
     if (gl.keys[XK_d]) {
        s->pos[0] += s->vel[1];
        s->vel[1] += s->speed;
-       s->speed *= 2;
-       if (s->vel[1] > 10.0)
-           s->vel[1] = 10.0;
+       if (s->vel[1] > MAX_VELOCITY)
+           s->vel[1] = MAX_VELOCITY;
     } else {
-        s->vel[1] = 0.02;
+        if(s->vel[1] > 0.0) {
+            s->pos[0] += s->vel[1];
+            s->vel[1] -= s->speed * 3;
+        } else {
+            s->vel[1] = 0.0;
+        }
     }
 
     if (gl.keys[XK_w]) {
        s->pos[1] += s->vel[2];
        s->vel[2] += s->speed;
-       s->speed *= 2;
-       if (s->vel[2] > 10.0)
-           s->vel[2] = 10.0;
+       if (s->vel[2] > MAX_VELOCITY)
+           s->vel[2] = MAX_VELOCITY;
+    } else {
+        if(s->vel[2] > 0.0) {
+            s->pos[1] += s->vel[2];
+            s->vel[2] -= s->speed * 3;
+        } else {
+            s->vel[2] = 0.0;
+        }
     }
 
     if (gl.keys[XK_s]) {
        s->pos[1] -= s->vel[3];
        s->vel[3] += s->speed;
-       s->speed *= 2;
-       if (s->vel[3] > 10.0)
-           s->vel[3] = 10.0;
+       if (s->vel[3] > MAX_VELOCITY)
+           s->vel[3] = MAX_VELOCITY;
+    } else {
+        if(s->vel[3] > 0.0) {
+            s->pos[1] -= s->vel[3];
+            s->vel[3] -= s->speed * 3;
+        } else {
+            s->vel[3] = 0.0;
+        }
     }
 
     if (g.thrustOn) {
