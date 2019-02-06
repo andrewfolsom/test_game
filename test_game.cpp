@@ -328,7 +328,7 @@ void physics()
     } else {
         if(s->vel[0] > 0.0) {
             s->pos[0] -= s->vel[0];
-            s->vel[0] -= s->speed * 3;
+            s->vel[0] -= s->speed;
         } else {
             s->vel[0] = 0.0;
         }
@@ -343,7 +343,7 @@ void physics()
     } else {
         if(s->vel[1] > 0.0) {
             s->pos[0] += s->vel[1];
-            s->vel[1] -= s->speed * 3;
+            s->vel[1] -= s->speed;
         } else {
             s->vel[1] = 0.0;
         }
@@ -357,7 +357,7 @@ void physics()
     } else {
         if(s->vel[2] > 0.0) {
             s->pos[1] += s->vel[2];
-            s->vel[2] -= s->speed * 3;
+            s->vel[2] -= s->speed;
         } else {
             s->vel[2] = 0.0;
         }
@@ -371,7 +371,7 @@ void physics()
     } else {
         if(s->vel[3] > 0.0) {
             s->pos[1] -= s->vel[3];
-            s->vel[3] -= s->speed * 3;
+            s->vel[3] -= s->speed;
         } else {
             s->vel[3] = 0.0;
         }
